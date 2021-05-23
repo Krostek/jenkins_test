@@ -1,10 +1,7 @@
-pipeline {
-    agent any
-    stages {
-        stage('build') {
-            steps {
-                sh 'python --version'
-            }
+podTemplate {
+    node(POD_LABEL) {
+        stage('Run shell') {
+            sh 'echo hello world'
         }
     }
 }
