@@ -14,7 +14,6 @@ podTemplate(label: 'mypod', containers: [
                 // example to show you can run docker commands when you mount the socket
                 sh 'hostname'
                 sh 'hostname -i'
-                sh 'sleep 60'
                 sh 'docker ps'
             }
         }
