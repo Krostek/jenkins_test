@@ -17,7 +17,6 @@ podTemplate(label: 'mypod', containers: [
                 sh 'ls .. -a'
                 sh 'pwd'
                 sh 'docker ps'
-                sh 'docker login fthazureacrtest.azurecr.io'
             }
         }
         
