@@ -17,7 +17,7 @@ podTemplate(label: 'mypod', containers: [
 
 	stage('AWS creds') {
             container('awscli') {
-                sh 'aws ecr-public get-login-password --region us-east-1D > awscreds'
+                sh 'aws ecr-public get-login-password --region us-east-1 > awscreds'
 		sh 'cat awscreds'
             }
         }
