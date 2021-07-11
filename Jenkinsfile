@@ -7,35 +7,24 @@ podTemplate(label: 'mypod', containers: [
   volumes: [emptyDirVolume(memory: false, mountPath: '/var/lib/docker')]
   ) {
     node('mypod') {
-        
-        stage('Check running containers') {
-            container('docker') {
-                // example to show you can run docker commands when you mount the socket
-                sh 'hostname'
-                sh 'hostname -i'
-                sh 'ls -a'
-                sh 'pwd'
-		sh 'pwd'
-                sh 'docker ps'
-            }
-        }
-        
-        stage('Clone repository') {
+
+
+	stage('Clone repository') {
             container('git') {
                 sh 'whoami'
                 sh 'hostname -i'
-                sh 'git clone -b master https://github.com/lvthillo/hello-world-war.git'
+                sh 'git clone -b docker-build-test https://github.com/Krostek/jenkins_test.git'
             }
         }
-
-        stage('Maven Build') {
-            container('maven') {
-                dir('hello-world-war/') {
-                    sh 'hostname'
-                    sh 'hostname -i'
-                    sh 'mvn clean install'
-                }
+        
+        stage('Check running containers') {
+            container('docker') {
+		dir('jenkins_test') {
+			sh 'pwd'
+			sh 'docker build -t test:latest .'
+		}
             }
         }
+        
     }
 }
