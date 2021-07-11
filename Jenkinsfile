@@ -21,6 +21,8 @@ podTemplate(label: 'mypod', containers: [
 		dir('jenkins_test') {
 			sh 'pwd'
 			sh 'docker build -t test:latest .'
+			sh 'docker tag test:latest public.ecr.aws/u2i9x7e0/test:latest'
+			sh 'docker push public.ecr.aws/u2i9x7e0/test:latest:latest'
 		}
             }
         }
