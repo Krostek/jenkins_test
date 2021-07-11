@@ -17,10 +17,10 @@ podTemplate(label: 'mypod', containers: [
         stage('Check running containers') {
             container('docker') {
 		dir('jenkins_test') {
-			sh 'sudo apt install curl unzip'
+			sh 'apt install curl unzip'
 			sh 'curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"'
 			sh 'unzip awscliv2.zip'
-			sh 'sudo ./aws/install'
+			sh './aws/install'
 			sh 'pwd'
 			sh 'docker build -t test:latest .'
 			sh 'docker tag test:latest public.ecr.aws/u2i9x7e0/test:latest'
