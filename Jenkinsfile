@@ -18,12 +18,12 @@ podTemplate(label: 'mypod', containers: [
 	stage('AWS creds') {
             container('awscli') {
                 sh 'aws ecr-public get-login-password --region us-east-1 > awscreds'
-		sh 'cat awscreds'
             }
         }
         
         stage('Check running containers') {
             container('docker') {
+		sh 'cat awscreds | docker login --username AWS --password-stdin public.ecr.aws/u2i9x7e0'
 		dir('jenkins_test') {
 			sh 'pwd'
 			sh 'docker build -t test:latest .'
