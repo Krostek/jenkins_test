@@ -1,41 +1,37 @@
 podTemplate(label: 'mypod', containers: [
     containerTemplate(name: 'git', image: 'alpine/git', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'maven', image: 'maven:3.3.9-jdk-8-alpine', command: 'cat', ttyEnabled: true),
-    containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
+    containerTemplate(name: 'awscli', image: 'amazon/aws-cli', ttyEnabled: true, command: 'cat'),
+    containerTemplate(name: 'docker', image: 'docker:dind', ttyEnabled: true, alwaysPullImage: true, privileged: true,
+      command: 'dockerd --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2375 --storage-driver=overlay')
   ],
-  volumes: [
-    hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-  ]
+  volumes: [emptyDirVolume(memory: false, mountPath: '/var/lib/docker')]
   ) {
     node('mypod') {
-        
-        stage('Check running containers') {
-            container('docker') {
-                // example to show you can run docker commands when you mount the socket
-                sh 'hostname'
-                sh 'hostname -i'
-                sh 'ls -al'
-                sh 'pwd'
-                sh 'docker ps'
-            }
-        }
-        
-        stage('Clone repository') {
+
+
+	stage('Clone repository') {
             container('git') {
-                sh 'whoami'
-                sh 'hostname -i'
-                sh 'git clone -b master https://github.com/lvthillo/hello-world-war.git'
+                sh 'git clone -b docker-build-test https://github.com/Krostek/jenkins_test.git'
             }
         }
 
-        stage('Maven Build') {
-            container('maven') {
-                dir('hello-world-war/') {
-                    sh 'hostname'
-                    sh 'hostname -i'
-                    sh 'mvn clean install'
-                }
+	stage('AWS creds') {
+            container('awscli') {
+                sh 'aws ecr-public get-login-password --region us-east-1 > awscreds'
             }
         }
+        
+        stage('Check running containers') {
+            container('docker') {
+		sh 'cat awscreds | docker login --username AWS --password-stdin public.ecr.aws/u2i9x7e0'
+		dir('jenkins_test') {
+			sh 'pwd'
+			sh 'docker build -t test:latest .'
+			sh 'docker tag test:latest public.ecr.aws/u2i9x7e0/fth-test-jenkins:latest'
+			sh 'docker push public.ecr.aws/u2i9x7e0/fth-test-jenkins:latest'
+		}
+            }
+        }
+        
     }
 }
